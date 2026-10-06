@@ -1,0 +1,50 @@
+name: EV Charge Controller
+version: "0.1.0"
+slug: ev_charge_controller
+description: PV-Überschussladen für Tesla (BLE) mit dummer Wallbox
+arch: [aarch64, amd64, armv7]
+startup: application
+boot: auto
+init: false
+homeassistant_api: true
+ingress: true
+ingress_port: 8088
+panel_icon: mdi:ev-station
+panel_title: Tesla Laden
+options:
+  dry_run: true
+  entities:
+    pv_power: sensor.pv_gesamt_erzeugung
+    grid_power: sensor.hostname_ostwest_grid_power
+    battery_power: sensor.hostname_ostwest_battery_power
+    battery_soc: sensor.hostname_ostwest_battery_soc
+    house_power: sensor.hostname_ostwest_home_power
+    ev_soc: sensor.tesla_ble_my_charge_level
+    ev_plugged: binary_sensor.tesla_ble_my_charge_flap
+    ev_charging_switch: switch.tesla_ble_my_charger
+    ev_amps_number: number.tesla_ble_my_charging_amps
+    invert_grid: false
+    invert_battery: true
+  vehicle:
+    capacity_kwh: 55
+    phases: 3
+    voltage: 230
+schema:
+  dry_run: bool
+  entities:
+    pv_power: str
+    grid_power: str
+    battery_power: str?
+    battery_soc: str?
+    house_power: str?
+    ev_soc: str
+    ev_plugged: str?
+    ev_charging_switch: str
+    ev_amps_number: str
+    ev_power: str?
+    invert_grid: bool
+    invert_battery: bool
+  vehicle:
+    capacity_kwh: float
+    phases: int(1,3)
+    voltage: int

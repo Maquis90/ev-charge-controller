@@ -1,0 +1,27 @@
+ha:
+  url: http://homeassistant.local:8123
+  token: "LONG_LIVED_ACCESS_TOKEN"
+  interval_s: 10
+dry_run: true   # erst testen: es werden keine Befehle gesendet
+entities:
+  pv_power: sensor.pv_gesamt_erzeugung
+  grid_power: sensor.hostname_ostwest_grid_power   # + = Bezug
+  battery_power: sensor.hostname_ostwest_battery_power   # Kostal: + = Entladen
+  battery_soc: sensor.hostname_ostwest_battery_soc
+  house_power: sensor.hostname_ostwest_home_power
+  ev_soc: sensor.tesla_ble_my_charge_level
+  ev_plugged: binary_sensor.tesla_ble_my_charge_flap
+  ev_charging_switch: switch.tesla_ble_my_charger
+  invert_battery: true
+  ev_amps_number: number.tesla_ble_my_charging_amps
+vehicle:
+  capacity_kwh: 55
+  phases: 3
+  voltage: 230
+settings:
+  mode: smart
+  min_amps: 6
+  max_amps: 16
+  max_soc: 80
+  min_soc_tomorrow: 40
+  deadline: "07:00"
