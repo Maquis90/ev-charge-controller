@@ -121,6 +121,7 @@ class Runner:
             "state": self.state.model_dump(),
             "decision": self.decision.model_dump(),
             "settings": self.cfg.settings.model_dump(mode="json"),
+            "kw_per_amp": self.cfg.vehicle.voltage * self.cfg.vehicle.phases / 1000,
             "error": self.error,
             "dry_run": self.cfg.dry_run,
         }
