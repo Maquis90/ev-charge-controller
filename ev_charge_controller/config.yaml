@@ -1,5 +1,5 @@
 name: EV Charge Controller
-version: "0.1.0"
+version: "0.1.1"
 slug: ev_charge_controller
 description: PV-Überschussladen für Tesla (BLE) mit dummer Wallbox
 arch: [aarch64, amd64, armv7]
