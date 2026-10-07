@@ -43,8 +43,8 @@ def decide(s: Settings, st: State, v: VehicleConfig, now: datetime) -> Decision:
         a = max(v.hard_min_amps, min(v.hard_max_amps, s.express_amps))
         return Decision(charge=True, amps=a, reason="Express")
 
-    # SMART: car may use what the grid would otherwise receive plus its own draw
-    avail = st.ev_w - st.grid_w - s.grid_offset_w
+    # Remove actual battery discharge before adding the separately allowed car draw.
+    avail = st.ev_w - st.grid_w + min(st.battery_w, 0) - s.grid_offset_w
     if st.battery_soc is None or st.battery_soc >= s.battery_min_soc:
         avail += max(st.battery_w, 0) + s.battery_max_discharge_w
     amps = int(avail // watts_per_amp(v))
@@ -75,8 +75,12 @@ class Controller:
         # smooth amps over ~60 s to avoid flapping with cloud edges
         if raw.charge:
             self._avg = [(t, a) for t, a in self._avg if (now - t).total_seconds() <= 60]
-            self._avg.append((now, raw.amps))
-            raw.amps = round(sum(a for _, a in self._avg) / len(self._avg))
+            avg_amps = sum(a for _, a in self._avg) / len(self._avg) if self._avg else raw.amps
+            if raw.amps < avg_amps:
+                self._avg = [(now, raw.amps)]
+            else:
+                self._avg.append((now, raw.amps))
+                raw.amps = round(sum(a for _, a in self._avg) / len(self._avg))
         else:
             self._avg = []
 

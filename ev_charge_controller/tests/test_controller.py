@@ -50,6 +50,25 @@ def test_battery_discharge_and_priority():
     assert decide(s, st(grid_w=0, ev_w=0, battery_soc=10, battery_w=3000), V, NOW).amps == 6
 
 
+def test_smart_does_not_double_count_battery_discharge():
+    s = Settings(min_amps=4, max_amps=16, battery_min_soc=50, battery_max_discharge_w=4000)
+    state = st(amps_now=16, ev_w=11040, grid_w=3737, battery_w=-5874, battery_soc=98)
+
+    d = decide(s, state, V, NOW)
+
+    assert d.charge and d.amps == 7
+
+
+def test_smart_applies_downward_amp_changes_without_smoothing_delay():
+    c = Controller()
+    s = Settings(min_amps=4, max_amps=16, battery_min_soc=50, battery_max_discharge_w=4000)
+    c.step(s, st(amps_now=16, ev_w=11040, grid_w=-2000), V, NOW)
+
+    d = c.step(s, st(amps_now=6, ev_w=11040, grid_w=3737, battery_w=-5874, battery_soc=98), V, NOW)
+
+    assert d.charge and d.amps == 7
+
+
 def test_deadline_forces_max():
     s = Settings(min_soc_tomorrow=80, max_soc=90, max_amps=16, deadline="13:00")
     d = decide(s, st(grid_w=3000, ev_w=0, ev_soc=30), V, NOW)
